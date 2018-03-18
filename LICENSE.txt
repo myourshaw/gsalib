@@ -1,3 +1,5 @@
+MIT License
+
 Copyright (c) 2018 Michael Yourshaw
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -20,7 +22,7 @@ SOFTWARE.
 
 
 
-LICENCE for original R package
+LICENCE for original R package:
 
 License:	MIT + file LICENSE
 YEAR: 2012
