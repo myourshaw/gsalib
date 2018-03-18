@@ -1,2 +1,2 @@
 # gsalib
-A Python version of the R gsalib for using GATK Reports files with pandas
+A Python version of the R gsalib library of utility functions for GATK, specifically for reading GATK Report files into pandas DataFrames
