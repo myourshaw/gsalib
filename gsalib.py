@@ -36,29 +36,26 @@ import pandas as pd
 from warnings import warn
 
 if sys.version_info > (3, 0):
-    from collections import UserDict
+    from collections.abc import MutableMapping
 else:
-    from UserDict import UserDict
+    from collections import MutableMapping
+
+# if sys.version_info > (3, 0):
+#     from collections import UserDict
+# else:
+#     from UserDict import UserDict
 
 
 class GsaLibError(Exception):
     pass
 
 
-class GatkReport(UserDict):
+class GatkReport(MutableMapping):
     """
     A key-value collection of pandas DataFrames, each representing a table in a GATK report,
     where key is the (possibly uniquified) table name and value is the DataFrame.
     This is a substitute for .gsa.assignGATKTableToEnvironment in the R gsalib.
     """
-    # public attributes
-    # the path of the GATKReport file
-    filename = None
-    # The name of the collection, typically the basename of the filename
-    name = None
-    # the version of the GATKReport
-    version = None
-
     # private stuff
     _used_names = Counter()
     _n_tables = None
@@ -74,6 +71,48 @@ class GatkReport(UserDict):
     _TableFormat = namedtuple('TableFormat', 'n_cols, n_rows, col_formats')
     _TableId = namedtuple('TableId', 'table_name, table_description')
 
+    def __init__(self, filename, *args, **kwargs):
+        self.tables = dict()
+        self.update(dict(*args, **kwargs))  # use the free update to set keys
+        # the path of the GATKReport file
+        self.filename = filename
+        # The name of the collection, typically the basename of the filename
+        self.name = os.path.basename(self.filename)
+
+        # Load all GATKReport tables from a file
+        with open(self.filename,  'r') as fh:
+            self.lines = [line.rstrip() for line in fh]
+
+        # get first line, which must be a GATKReport record
+        report_id = self._get_report_id(self.lines[0])
+
+        if report_id is not None:
+            # the version of the GATKReport
+            self.version = report_id.version
+            # assume that versions >=1 will be compatible with 1.2
+            if self.version[0] >= 1:
+                self._n_tables = report_id.n_tables
+                self._read_gatkreportv1(self.lines)
+            if self.version[0] == 0:
+                self._read_gatkreportv0(self.lines)
+        else:
+            raise(GsaLibError, "This doesn't appear to be a versioned GATK Report file.")
+
+    def __getitem__(self, key):
+        return self.tables[key]
+
+    def __setitem__(self, key, value):
+        self.tables[key] = value
+
+    def __delitem__(self, key):
+        del self.tables[key]
+
+    def __iter__(self):
+        return iter(self.tables)
+
+    def __len__(self):
+        return len(self.tables)
+
     def __setitem__(self, dataframe):
         """
         Add a Dataframe to the report.
@@ -88,7 +127,7 @@ class GatkReport(UserDict):
         self._used_names[table_name] += 1
         if self._used_names[table_name] > 1:
             dataframe.name = table_name = '{}.{}'.format(table_name, str(self._used_names[table_name]))
-        self.data[table_name] = dataframe
+        self.tables[table_name] = dataframe
 
     def _get_report_id(self, report_line):
         """
@@ -179,7 +218,7 @@ class GatkReport(UserDict):
                         df = pd.read_fwf(table_str, )
 
                     df.name = table_id.table_name
-                    self.data[df.name] = df
+                    self.tables[df.name] = df
 
                     # clear table data to start a new one
                     table_id = None
@@ -208,7 +247,7 @@ class GatkReport(UserDict):
                 df = pd.read_fwf(table_str, )
 
             df.name = table_id.table_name
-            self.data[df.name] = df
+            self.tables[df.name] = df
 
     # Load all GATKReport v1 tables from file
     def _read_gatkreportv1(self, lines):
@@ -244,7 +283,7 @@ class GatkReport(UserDict):
                     # Read a table of fixed-width formatted lines into DataFrame
                     df = pd.read_fwf(table_str, )
                     df.name = table_id.table_name
-                    self.data[df.name] = df
+                    self.tables[df.name] = df
 
                     # clear table data to start a new one
                     table_format = None
@@ -277,47 +316,7 @@ class GatkReport(UserDict):
             df = pd.read_fwf(table_str, )
 
             df.name = table_id.table_name
-            self.data[df.name] = df
+            self.tables[df.name] = df
         if n_tables != self._n_tables:
             warn('Table {} should have {} tables, but actually has {}.'.format(
                 table_id.table_name, self._n_tables, n_tables))
-
-    # Load all GATKReport tables from a file
-    def read_gatkreport(self, filename):
-        """
-        Populates a GATKReport object with pandas DataFrames for each table in the report
-        :param filename: the path of a GATK Report file
-        :return: None
-        """
-        with open(filename,  'r') as con:
-            lines = [line.rstrip() for line in con]
-
-        # get first line which must be a GATKReport record
-        report_id = self._get_report_id(lines[0])
-
-        if report_id is not None:
-            self.filename = filename
-            self.name = os.path.basename(filename)
-            self.version = report_id.version
-            # assume that versions >=1 will be compatible with 1.2
-            if self.version[0] >= 1:
-                self._n_tables = report_id.n_tables
-                self._read_gatkreportv1(lines)
-            if self.version[0] == 0:
-                self._read_gatkreportv0(lines)
-        else:
-            raise(GsaLibError, "This doesn't appear to be a versioned GATK Report file.")
-
-
-# tests
-for file in [
-    '../data/test_v0.1.table',
-    '../data/test_v0.2.table',
-    '../data/test_v1.0_gatkreport.table',
-    '../data/test_v1.1_varianteval.grp',
-    '../data/test_v1.1_genconcord.grp',
-]:
-    report = GatkReport()
-    report.read_gatkreport(file)
-    print(file)
-    print(report)

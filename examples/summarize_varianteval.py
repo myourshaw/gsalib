@@ -1,8 +1,9 @@
 """
-Copyright 2018 Michael Yourshaw All Rights Reserved
+Copyright 2018 Michael Yourshaw. All rights reserved.
+
 myourshaw@gmail.com
 
-Non-profit use under MIT license
+Licensed under the MIT license.
 
 Summarize several tables produced by GATK VariantEval into a VariantEvalMetricsSummary table
 as described in (howto) Evaluate a callset with VariantEval
@@ -17,7 +18,7 @@ import json
 import pandas as pd
 from pathlib import Path
 
-import gsalib
+from gsalib import GatkReport
 
 
 def df_to_dict(df, orient='None'):
@@ -42,24 +43,23 @@ def run(**kwargs):
         summary_file = report_file + '.summary.grp'
     Path(summary_file).parent.mkdir(parents=True, exist_ok=True)
 
-    report = gsalib.GatkReport()
-    report.read_gatkreport(report_file)
+    tables = GatkReport(report_file).tables
 
     for k in report.keys():
-        report[k].reset_index(inplace=True)
+        tables[k].reset_index(inplace=True)
 
     for k in report.keys():
-        report[k].set_index(['CompRod', 'Novelty'], inplace=True)
+        tables[k].set_index(['CompRod', 'Novelty'], inplace=True)
 
     # Metrics Analysis
     # See https://software.broadinstitute.org/gatk/documentation/article?id=6211
 
-    compoverlap = report['CompOverlap'].loc[:, ['concordantRate']]
-    indelsummary = report['IndelSummary'].loc[:, ['n_SNPs', 'n_indels', 'insertion_to_deletion_ratio']]
-    titvvariantevaluator = report['TiTvVariantEvaluator'].loc[:, ['tiTvRatio']]
-    countvariants = report['CountVariants'].loc[:, ['nSNPs', 'insertionDeletionRatio']]
-    multiallelicsummary = report['MultiallelicSummary'].loc[:, ['nSNPs', 'nIndels']]
-    validationreport = report['ValidationReport'].loc[:, ['nComp', 'TP', 'FP', 'FN', 'TN']]
+    compoverlap = tables['CompOverlap'].loc[:, ['concordantRate']]
+    indelsummary = tables['IndelSummary'].loc[:, ['n_SNPs', 'n_indels', 'insertion_to_deletion_ratio']]
+    titvvariantevaluator = tables['TiTvVariantEvaluator'].loc[:, ['tiTvRatio']]
+    countvariants = tables['CountVariants'].loc[:, ['nSNPs', 'insertionDeletionRatio']]
+    multiallelicsummary = tables['MultiallelicSummary'].loc[:, ['nSNPs', 'nIndels']]
+    validationreport = tables['ValidationReport'].loc[:, ['nComp', 'TP', 'FP', 'FN', 'TN']]
 
     metrics_analysis = pd.concat([
         compoverlap,
