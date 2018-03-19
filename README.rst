@@ -39,6 +39,11 @@ Python version: Michael Yourshaw <myourshaw@gmail.com>
 **References**
 http://www.broadinstitute.org/gatk/guide/article?id=1244
 
+**Installation**
+
+::
+    pip install gsalib
+
 **Examples**
 
 ::
