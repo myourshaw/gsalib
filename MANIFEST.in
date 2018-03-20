@@ -4,8 +4,11 @@ include LICENSE.txt
 # Include the executable script
 include *.py
 
+# Include the docs
+# recursive-include docs *
+
 # Include the examples
-recursive-include examples *.py *.grp
+# recursive-include examples *.py *.grp
 
 # Include the tests
-recursive-include test *.py *.grp *.txt *.table
+# recursive-include test *.py *.grp *.txt *.table
