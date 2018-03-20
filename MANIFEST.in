@@ -2,7 +2,7 @@
 include LICENSE.txt
 
 # Include the executable script
-include *.py
+include gsalib.py
 
 # Include the docs
 # recursive-include docs *

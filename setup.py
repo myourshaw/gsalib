@@ -114,7 +114,7 @@ setup(
     # the `py_modules` argument instead as follows, which will expect a file
     # called `my_module.py` to exist:
     #
-    #   py_modules=["my_module"],
+    py_modules=['gsalib'],
     #
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),  # Required
 
@@ -134,10 +134,10 @@ setup(
     #
     # Similar to `install_requires` above, these must be valid existing
     # projects.
-    extras_require={  # Optional
-        'dev': ['check-manifest'],
-        'test': ['coverage'],
-    },
+    # extras_require={  # Optional
+    #     'dev': ['check-manifest'],
+    #     'test': ['coverage'],
+    # },
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.
