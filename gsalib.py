@@ -72,6 +72,12 @@ class GatkReport(MutableMapping):
     _TableId = namedtuple('TableId', 'table_name, table_description')
 
     def __init__(self, filename, *args, **kwargs):
+        """
+        Initialize an instance of GatkReport
+        :param filename: path to a GATKReport file
+        :param args: args
+        :param kwargs: kwargs
+        """
         self.tables = dict()
         self.update(dict(*args, **kwargs))  # use the free update to set keys
         # the path of the GATKReport file
@@ -131,7 +137,7 @@ class GatkReport(MutableMapping):
 
     def _get_report_id(self, report_line):
         """
-        Get the version of the GATK report. Fo versions >=1 also get number of tables.
+        Get the version of the GATK report. Fo versions >=1 also get the number of tables.
         :param report_line: report definition line
         :return: ReportId (version, n_tables,)
         """
@@ -149,7 +155,7 @@ class GatkReport(MutableMapping):
 
     def _get_table_format(self, table_format_line):
         """
-        Get the format of a GATK table.
+        Get the format of a v1.x GATK table.
         :param table_format_line: table format definition line
         :return: TableFormat (n_cols, n_rows, col_formats,)
         """
@@ -163,7 +169,7 @@ class GatkReport(MutableMapping):
 
     def _get_table_v0_id(self, table_id_line):
         """
-        Get the name a GATK table.
+        Get the name a v0.x GATK table.
         :param table_id_line: table id definition line
         :return: TableId (table_name, table_description,)
         """
@@ -175,7 +181,7 @@ class GatkReport(MutableMapping):
 
     def _get_table_id(self, table_id_line):
         """
-        Get the name and description of a GATK table.
+        Get the name and description of a v1.x GATK table.
         :param table_id_line: table id definition line
         :return: TableId (table_name, table_description,)
         """

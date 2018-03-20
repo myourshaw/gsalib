@@ -8,9 +8,6 @@ Licensed under the MIT license.
 Summarize several tables produced by GATK VariantEval into a VariantEvalMetricsSummary table
 as described in (howto) Evaluate a callset with VariantEval
 https://software.broadinstitute.org/gatk/documentation/article?id=6211
-
---input /run/media/yoursham/MY_6Tb_0/germline/data/NA12878.lValExome0030/metrics/NA12878.lValExome0030.recalibrated.filtered.postCGP.GQfiltered.variant_eval.exome.grp
---input /run/media/yoursham/MY_6Tb_0/germline/data/NA12878.lValExome0030.0.1667/metrics/NA12878.lValExome0030.0.1667.recalibrated.filtered.postCGP.GQfiltered.variant_eval.exome.grp.summary.grp
 """
 
 from argparse import ArgumentParser
@@ -35,6 +32,13 @@ def df_to_dict(df, orient='None'):
 
 
 def run(**kwargs):
+    """
+    Summarize several tables produced by GATK VariantEval into a VariantEvalMetricsSummary table
+    as described in (howto) Evaluate a callset with VariantEval
+    https://software.broadinstitute.org/gatk/documentation/article?id=6211
+    :param kwargs: arguments from command line
+    :return: None
+    """
     report_file = kwargs['input']
     print(f'Reading report file : {report_file}')
     if kwargs['output']:
@@ -43,17 +47,20 @@ def run(**kwargs):
         summary_file = report_file + '.summary.grp'
     Path(summary_file).parent.mkdir(parents=True, exist_ok=True)
 
-    tables = GatkReport(report_file).tables
+    # read report file
+    report = GatkReport(report_file)
+    tables = report.tables
 
+    # reindex tables by CompRod, Novelty
     for k in report.keys():
         tables[k].reset_index(inplace=True)
-
     for k in report.keys():
         tables[k].set_index(['CompRod', 'Novelty'], inplace=True)
 
-    # Metrics Analysis
+    # Create VariantEvalMetricsSummary table
     # See https://software.broadinstitute.org/gatk/documentation/article?id=6211
 
+    # select interesting data from VariantEval tables
     compoverlap = tables['CompOverlap'].loc[:, ['concordantRate']]
     indelsummary = tables['IndelSummary'].loc[:, ['n_SNPs', 'n_indels', 'insertion_to_deletion_ratio']]
     titvvariantevaluator = tables['TiTvVariantEvaluator'].loc[:, ['tiTvRatio']]
@@ -61,6 +68,7 @@ def run(**kwargs):
     multiallelicsummary = tables['MultiallelicSummary'].loc[:, ['nSNPs', 'nIndels']]
     validationreport = tables['ValidationReport'].loc[:, ['nComp', 'TP', 'FP', 'FN', 'TN']]
 
+    # create a concatenated DataFrame of the interesting data
     metrics_analysis = pd.concat([
         compoverlap,
         indelsummary,
@@ -72,32 +80,35 @@ def run(**kwargs):
         axis=1)
 
     # TODO: dynamically compute formats
-    COL_FORMATS = '%s:%s:%s:%.2f:%d:%d:%.2f:%.2f:%d:%.2f%d:%d:%d:%d:%d:%d:%d'
-    # col_types = []
-    # header_formats = []
-    # output_formats = []
-    # for cell in list(metrics_analysis.itertuples())[0]:
-    #     col_types.append(type(cell))
+    col_formats = '%s:%s:%s:%.2f:%d:%d:%.2f:%.2f:%d:%.2f%d:%d:%d:%d:%d:%d:%d'
 
+    # convert DataFrame to dict
     metrics_dict = df_to_dict(metrics_analysis, orient='split')
 
     # an extra VariantEvalMetricsSummary column and two indices will be added
     n_cols = len(metrics_dict['columns']) + 3
     n_rows = len(metrics_dict['data'])
 
-    # TODO: left justify strings
     with open(summary_file, 'w') as sf:
+        # report and table metadata
         sf.write('#:GATKReport.v1.1:1' + '\n')
-        sf.write(f'#:GATKTable:{n_cols}:{n_rows}:{COL_FORMATS}:;' + '\n')
+        sf.write(f'#:GATKTable:{n_cols}:{n_rows}:{col_formats}:;' + '\n')
         sf.write(f'#:GATKTable:{kwargs["table_name"]}:Selected metrics from VariantEval' + '\n')
-        rows = [[kwargs["table_name"]] +['CompRod', 'Novelty'] + metrics_dict['columns']]
+        # columns header
+        rows = [[kwargs["table_name"]] + ['CompRod', 'Novelty'] + metrics_dict['columns']]
+        # table data
         for i in range(len(metrics_dict['index'])):
-            rows.append([kwargs["table_name"]] + list(metrics_dict['index'][i]) + list(map(str, metrics_dict['data'][i])))
+            rows.append([kwargs["table_name"]]
+                        + list(metrics_dict['index'][i])
+                        + list(map(str, metrics_dict['data'][i])))
+
+        # TODO: left justify strings
+        # write header and data in fixed width format
         widths = [max(map(len, col)) for col in zip(*rows)]
         for row in rows:
             sf.write("  ".join((val.rjust(width) for val, width in zip(row, widths))) + '\n')
 
-    print(f'Results output to : {summary_file}')
+    print(f'Results saved to : {summary_file}')
 
 
 def main():

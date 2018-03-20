@@ -12,6 +12,7 @@ Welcome to gsalib's documentation!
 
    intro
    tutorial
+   module
 
 
 

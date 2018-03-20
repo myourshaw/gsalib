@@ -1,47 +1,88 @@
-$project Tutorial
+gsalib Tutorial
 =================
 
 Introduction
 ------------
 
-A GATKReport is simply a text document that contains well-formatted, easy to read representation of some tabular data. Many GATK tools output their results as GATKReports. A report contains one or more individual GATK report tables. Every table begins with a header for its metadata and then a header for its name and description. The next row contains the column names followed by the data.
+A GATKReport is simply a text document that contains a well-formatted, easy to read representation of some tabular data. Many GATK tools output their results as GATKReports. A report contains one or more individual GATK report tables.
 
+Here's a simple example (from `What is the GATKReport file format? <https://gatkforums.broadinstitute.org/gatk/discussion/1244/what-is-the-gatkreport-file-format>`_)::
 
-#:GATKReport.v1.1:2
-#:GATKTable:11:3:%s:%s:%s:%s:%s:%d:%d:%d:%.2f:%d:%.2f:;
-#:GATKTable:CompOverlap:The overlap between eval and comp sites
-CompOverlap  CompRod          EvalRod  JexlExpression  Novelty  nEvalVariants  novelSites  nVariantsAtComp  compRate  nConcordant  concordantRate
-CompOverlap  dbsnp            test     none            all             106259        3869           102390     96.36        98845           96.54
-CompOverlap  dbsnp            test     none            known           102390           0           102390    100.00        98845           96.54
-CompOverlap  dbsnp            test     none            novel             3869        3869                0      0.00            0            0.00
+    #:GATKReport.v1.0:2
+    #:GATKTable:true:2:9:%.18E:%.15f:;
+    #:GATKTable:ErrorRatePerCycle:The error rate per sequenced position in the reads
+    cycle  errorrate.61PA8.7         qualavg.61PA8.7
+    0      7.451835696110506E-3      25.474613284804366
+    1      2.362777171937477E-3      29.844949954504095
+    2      9.087604507451836E-4      32.875909752547310
+    3      5.452562704471102E-4      34.498999090081895
+    4      9.087604507451836E-4      35.148316651501370
+    5      5.452562704471102E-4      36.072234352256190
+    6      5.452562704471102E-4      36.121724890829700
+    7      5.452562704471102E-4      36.191048034934500
+    8      5.452562704471102E-4      36.003457059679770
 
-#:GATKTable:14:3:%s:%s:%s:%s:%s:%d:%d:%.2f:%d:%d:%.2f:%d:%d:%.2f:;
-#:GATKTable:TiTvVariantEvaluator:Ti/Tv Variant Evaluator
-TiTvVariantEvaluator  CompRod          EvalRod  JexlExpression  Novelty  nTi    nTv    tiTvRatio  nTiInComp  nTvInComp  TiTvRatioStandard  nTiDerived  nTvDerived  tiTvDerivedRatio
-TiTvVariantEvaluator  dbsnp            test     none            all      63401  28285       2.24    7858386    3505967               2.24           0           0              0.00
-TiTvVariantEvaluator  dbsnp            test     none            known    61998  26601       2.33      59124      24217               2.44           0           0              0.00
-TiTvVariantEvaluator  dbsnp            test     none            novel     1403   1684       0.83    7799262    3481750               2.24           0           0              0.00
+    #:GATKTable:false:2:3:%s:%c:;
+    #:GATKTable:TableName:Description
+    key    column
+    1:1000  T
+    1:1001  A
+    1:1002  C
 
-Installation
-------------
-Install $project by running:
+This report contains two individual GATK report tables. Every table begins with a header for its metadata and then a header for its name and description. The next row contains the column names followed by the data.
 
+The Python module gsalib allows you to load GATKReport files into Python/pandas for further analysis. Here are the simple steps to getting gsalib, installing it, and loading a report.
 
-::
+1. Get the gsalib module from PyPI
+------------------------------------
+Install gsalib by running on the command line::
+
     pip install gsalib
 
-Analysis
---------
-$project has one class, `GatkReport`, that is a dict-like container for all of the tables in a GATK Report file. The `tables` attribute is a key-value object where the key is the table name and the value is a pandas DataFrame that contains the table's data. Note that if a report contains more than one table with the same name the keys will be uniquified as `table`, `table.1`, etc.
-
-Load a report:
+2. Start Python (or open a Python notebook in Jupyter)
+------------------------------------------------------
 ::
-from gsalib import GatkReport
-import pandas as pd
 
-report = GatkReport('test_v1.1.grp')
-report_name = report.name
-report_tables = report.tables
-number of tables = len(report_tables)
-table_names = list(tables.keys())
-df = tables['GenotypeConcordance_CompProportions']
+    $ python3
+    Python 3.6.4 (default, Dec 19 2017, 11:33:49)
+    [GCC 6.3.0] on linux
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>>
+
+3. Load the GatkReport object from gsalib
+-----------------------------------------
+::
+
+    >>> from gsalib import GatkReport
+
+4. Finally, load the GATKReport file and have fun
+-------------------------------------------------
+gsalib has one class, ``GatkReport``, that is a dict-like container for all of the tables in a GATK Report file. The ``GatkReport.tables`` attribute is a key-value object where the key is the table name and the value is a pandas DataFrame that contains the table's data. Note that if a report contains more than one table with the same name the keys will be uniquified as ``table``, ``table.1``, etc.::
+
+    >>> d = GatkReport('/path/to/gsalib/test/test_v1.0_gatkreport.table')
+    >>> for table in d.tables:
+    ...     d[table].describe()
+
+
+              cycle  errorrate.61PA8.7  qualavg.61PA8.7
+    count  9.000000           9.000000         9.000000
+    mean   4.000000           0.001595        33.581250
+    std    2.738613           0.002273         3.687989
+    min    0.000000           0.000545        25.474613
+    25%    2.000000           0.000545        32.875910
+    50%    4.000000           0.000545        35.148317
+    75%    6.000000           0.000909        36.072234
+    max    8.000000           0.007452        36.191048
+               key column
+    count        3      3
+    unique       3      3
+    top     1:1000      A
+    freq         1      1
+
+For more examples, *see* `gsalib/examples <https://github.com/myourshaw/gsalib/tree/master/examples>`_.
+
+reshape_concordance_table
+    Given a GATKReport generated by GenotypeConcordance this function reshapes the concordance for a specified sample into a matrix with the EvalGenotypes in rows and the CompGenotypes in column.
+
+summarize_varianteval (Python3 only)
+    Summarize several tables produced by GATK VariantEval into a VariantEvalMetricsSummary table as described in `(howto) Evaluate a callset with VariantEval <https://software.broadinstitute.org/gatk/documentation/article?id=6211>`_.
