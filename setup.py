@@ -182,5 +182,6 @@ setup(
         'Funding': 'https://donate.pypi.org',
         'Say Thanks!': 'https://cran.r-project.org/web/packages/gsalib/index.html',
         'Source': 'https://github.com/myourshaw/gsalib/',
+        'Documentation': 'https://gsalib.readthedocs.io/en/latest/'
     },
 )

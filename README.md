@@ -13,3 +13,6 @@ from gsalib import GatkReport
 report = GatkReport('/path/to/gsalib/test/test_v1.0_gatkreport.table')
 table = report.tables['ExampleTable']
 ```
+
+# Documentation
+https://
