@@ -9,8 +9,7 @@ pip install gsalib
 # Usage
 ```python
 from gsalib import GatkReport
-import pandas as pd
 
-report = GatkReport('test_v1.0.gatkreport.table')
-table = report.tables['GenotypeConcordance_Summary']
+report = GatkReport('/path/to/gsalib/test/test_v1.0_gatkreport.table')
+table = report.tables['ExampleTable']
 ```
