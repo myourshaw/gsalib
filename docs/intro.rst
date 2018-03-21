@@ -3,7 +3,7 @@ gsalib: Python/pandas package of utility functions for GATK
 
 ``gsalib`` makes it easy for Python users to analyze metrics reports created by the Broad Institute's Genome Analysis Toolkit (GATK). The Broad provides an R library called gsalib that allows you to load GATKReport files into R for further analysis (https://gatkforums.broadinstitute.org/gatk/discussion/1244/what-is-the-gatkreport-file-format). Python ``gsalib`` is an adaptation of the R libray that allows you to load GATKReport files into Python/pandas DataFrames.
 
-Neither the R nor Python versions of ``gsalib`` support the samtools.metrics reports created by `Picard Tools <https://broadinstitute.github.io/picard/picard-metric-definitions.html>`_. To analyze Picard reports with Python, consider using the ``parser.parse`` function in the `Crimson <https://pypi.python.org/pypi/Crimson>`_ module.
+Neither the R nor Python versions of ``gsalib`` support the samtools.metrics reports created by `Picard Tools <https://broadinstitute.github.io/picard/picard-metric-definitions.html>`_. To analyze Picard reports with Python, consider using the ``picard.parse`` function in the `Crimson <https://pypi.python.org/pypi/Crimson>`_ module.
 
 Features
 --------

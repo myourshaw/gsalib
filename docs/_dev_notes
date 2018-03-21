@@ -1,0 +1,52 @@
+cd /mnt/hdd/PycharmProjects/gsalib/docs
+make html
+
+cd /mnt/hdd/PycharmProjects/gsalib
+
+python3 setup.py sdist bdist_wheel --universal
+
+git add .
+git commit -m 'comment'
+git push -u origin master
+
+twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+pip3 uninstall gsalib
+pip3 install --index-url https://test.pypi.org/simple/ gsalib
+workon gsalib
+pip3 uninstall gsalib
+pip3 install --index-url https://test.pypi.org/simple/ gsalib
+
+# unittests
+python3 /mnt/hdd/PycharmProjects/gsalib/test/test_gsalib.py
+
+# test reshape example
+python3 /mnt/hdd/PycharmProjects/gsalib/examples/reshape_concordance_table.py
+
+# test variant eval example (python3 only)
+python3 /mnt/hdd/PycharmProjects/gsalib/examples/summarize_varianteval.py \
+--input /mnt/hdd/PycharmProjects/gsalib/examples/test_v1.1_varianteval.grp
+
+less /mnt/hdd/PycharmProjects/gsalib/examples/test_v1.1_varianteval.grp.summary.grp
+
+
+deactivate
+spack load python@2.7.13
+pip uninstall gsalib
+pip install --index-url https://test.pypi.org/simple/ gsalib
+
+# unittests
+python /mnt/hdd/PycharmProjects/gsalib/test/test_gsalib.py
+
+# test reshape example
+python /mnt/hdd/PycharmProjects/gsalib/examples/reshape_concordance_table.py
+
+
+# github
+https://github.com/myourshaw/gsalib
+
+# test.pypi
+https://test.pypi.org/project/gsalib/
+
+# readtedocs
+https://gsalib.readthedocs.io/en/latest/
