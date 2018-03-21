@@ -15,4 +15,4 @@ table = report.tables['ExampleTable']
 ```
 
 # Documentation
-https://
+https://gsalib.readthedocs.io/en/latest/
