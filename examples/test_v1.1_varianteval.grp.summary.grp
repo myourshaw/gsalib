@@ -1,0 +1,16 @@
+#:GATKReport.v1.1:1
+#:GATKTable:17:12:%s:%s:%s:%.2f:%d:%d:%.2f:%.2f:%d:%.2f%d:%d:%d:%d:%d:%d:%d:;
+#:GATKTable:VariantEvalMetricsSummary:Selected metrics from VariantEval
+VariantEvalMetricsSummary          CompRod  Novelty  concordantRate  n_SNPs  n_indels  insertion_to_deletion_ratio  tiTvRatio  nSNPs  insertionDeletionRatio  nSNPs  nIndels     nComp      TP  FP        FN     TN
+VariantEvalMetricsSummary  1000G_ALL_SITES      all           97.83   91750     15028                         0.69       2.24  91718                    0.67  91718    14336   3407109   93179   0   3302883  11047
+VariantEvalMetricsSummary  1000G_ALL_SITES    known           97.84   88663     14443                          0.7       2.33  88631                    0.69  88631    13759     94306   93159   0      1146      1
+VariantEvalMetricsSummary  1000G_ALL_SITES    novel            70.0    3087       585                         0.46       0.83   3087                    0.41   3087      577   3312803      20   0   3301737  11046
+VariantEvalMetricsSummary            axiom      all           99.74   91750     15028                         0.69       2.24  91718                    0.67  91718    14336    180584   11749   0    168835      0
+VariantEvalMetricsSummary            axiom    known           99.74   88663     14443                          0.7       2.33  88631                    0.69  88631    13759     11794   11723   0        71      0
+VariantEvalMetricsSummary            axiom    novel           100.0    3087       585                         0.46       0.83   3087                    0.41   3087      577    168790      26   0    168764      0
+VariantEvalMetricsSummary            dbsnp      all           96.54   91750     15028                         0.69       2.24  91718                    0.67  91718    14336  13034829  102390   0  12932407     32
+VariantEvalMetricsSummary            dbsnp    known           96.54   88663     14443                          0.7       2.33  88631                    0.69  88631    13759    108384  102390   0      5994      0
+VariantEvalMetricsSummary            dbsnp    novel             0.0    3087       585                         0.46       0.83   3087                    0.41   3087      577  12926445       0   0  12926413     32
+VariantEvalMetricsSummary             omni      all           99.92   91750     15028                         0.69       2.24  91718                    0.67  91718    14336    143346   33126   0    110220      0
+VariantEvalMetricsSummary             omni    known           99.92   88663     14443                          0.7       2.33  88631                    0.69  88631    13759     33152   33083   0        69      0
+VariantEvalMetricsSummary             omni    novel           100.0    3087       585                         0.46       0.83   3087                    0.41   3087      577    110194      43   0    110151      0

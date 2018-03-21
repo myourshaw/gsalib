@@ -4,16 +4,18 @@
 Tests for gsalib
 """
 
+import os
 import unittest
 
-from gsalib import GatkReport
+from gsalib import GatkReport, GsalibException
 
-test_bad = 'hs_metrics.txt'
-test_v10 = 'test_v1.0_gatkreport.table'
-test_v11 = 'test_v1.1.grp'
-test_v01 = 'test_v0.1.table'
-test_v02 = 'test_v0.2.table'
-# test_v11ve = 'test_v1.1_varianteval.grp'
+this_dir = os.path.dirname(os.path.realpath(__file__))
+
+test_bad = os.path.join(this_dir, 'hs_metrics.txt')
+test_v10 = os.path.join(this_dir, 'test_v1.0_gatkreport.table')
+test_v11 = os.path.join(this_dir, 'test_v1.1.grp')
+test_v01 = os.path.join(this_dir, 'test_v0.1.table')
+test_v02 = os.path.join(this_dir, 'test_v0.2.table')
 
 
 def read_report(filename):
@@ -25,7 +27,7 @@ class TestGsalibGatkReportBadInput(unittest.TestCase):
     gsalib does not recognize Picard samtools.metrics data
     """
     def test(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(GsalibException):
             report = read_report(test_bad)
 
 

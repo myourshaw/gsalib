@@ -46,7 +46,7 @@ else:
 #     from UserDict import UserDict
 
 
-class GsaLibError(Exception):
+class GsalibException(Exception):
     pass
 
 
@@ -102,7 +102,7 @@ class GatkReport(MutableMapping):
             if self.version[0] == 0:
                 self._read_gatkreportv0(self.lines)
         else:
-            raise(GsaLibError, "This doesn't appear to be a versioned GATK Report file.")
+            raise GsalibException("This isn't a GATK Report file or it's an unsupported version.")
 
     def __getitem__(self, key):
         return self.tables[key]
